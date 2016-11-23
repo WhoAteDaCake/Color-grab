@@ -1,0 +1,34 @@
+@import "defaults";
+
+body {
+	background: rgba(232, 228, 228, 0.54);
+}
+.wrapper {
+	margin: 2em;
+	.input {
+		button {
+			margin-left: 1em;
+		}
+		.info p {
+			margin:1em;
+		}
+	}
+}
+.form {
+	width: 80px;
+	button {
+		display: none;
+	}
+}
+#colors {
+	margin: 2em;
+	.inner{
+		display: flex;
+		flex-direction: row;
+		flex-wrap:wrap;
+	}
+	.color{
+		width: 40px;
+		height: 40px;
+	}
+}

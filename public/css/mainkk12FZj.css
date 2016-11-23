@@ -1,0 +1,45 @@
+.noselect {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none; }
+
+* {
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  list-style-type: none; }
+
+a, a:hover {
+  color: inherit; }
+
+body {
+  background: rgba(232, 228, 228, 0.54); }
+
+.wrapper {
+  margin: 2em; }
+  .wrapper .input button {
+    margin-left: 1em; }
+  .wrapper .input .info p {
+    margin: 1em; }
+
+.form {
+  width: 80px; }
+  .form button {
+    display: none; }
+
+#colors {
+  margin: 2em; }
+  #colors .inner {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+            flex-direction: row;
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap; }
+  #colors .color {
+    width: 40px;
+    height: 40px; }
