@@ -21,12 +21,14 @@ module.exports = class Color {
 		return a.map?[].concat(...a.map(this._flatten)):a;
 	}
 	_urlFix(link,initial) {
+
 		if(initial) {
-			if(link.indexOf("www") === 0 && link.indexOf("http") < 0) {
-				this.url = "http://" + link.split("/")[0];
-			} else {
+
+ 			if(link.indexOf("http") >= 0){
 				let url = link.split("/");
 				this.url = url[0] + "//" + url[2];
+			} else {
+				this.url = "http://" + link.split("/")[0];
 			}
 		} else if(link[0] + link[1] === "//") {
 			return "http:" + link;
@@ -42,7 +44,15 @@ module.exports = class Color {
 	}
 	_errFix(errorMain,message,info) {
 		if(errorMain.message) {
-			return errorMain;
+			if(errorMain.message.search("ENOTFOUND") >= 0) {
+				return {
+					error : errorMain,
+					message : message + " INVALID URL",
+					information : info,
+				};
+			}else {
+				return errorMain;
+			}
 		}else if (info){
 			return {
 				message : message,
