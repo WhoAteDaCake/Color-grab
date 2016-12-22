@@ -32,6 +32,9 @@ module.exports = class Color {
 			return "http:" + link;
 		} else if(link[0] === "/") {
 			return this.url + link;
+		} else if(link[0] + link[1] === "..") {
+			link = link.replace(/\.\.\//g,"");
+			return this.url + "/" + link;
 		} else {
 			return link;
 		}
@@ -39,7 +42,6 @@ module.exports = class Color {
 	}
 	_errFix(errorMain,message,info) {
 		if(errorMain.message) {
-			console.log(message,errorMain.message);
 			return errorMain;
 		}else if (info){
 			return {
@@ -226,7 +228,6 @@ module.exports = class Color {
 	            }
 	        }
 
-	        /* Modifies existing objects by adding HSV values. */
 	        colors[c].hue = hue;
 	        colors[c].sat = sat;
 	        colors[c].val = val;
@@ -261,7 +262,7 @@ module.exports = class Color {
 		return new Promise((res1,rej1) => {
 
 			this._urlFix(url,true);
-
+			console.log(this.url);
 			this._pageGrab(url)
 			.then(page => {
 
