@@ -17,6 +17,7 @@ module.exports = class Color {
 		this._rgb2hex = this._rgb2hex.bind(this);
 		this._errFix = this._errFix.bind(this);
 		this._urlClear = this._urlClear.bind(this);
+		this.colorCompare = this.colorCompare.bind(this);
 	}
 	_flatten(a) {
 		return a.map?[].concat(...a.map(this._flatten)):a;
