@@ -6,13 +6,13 @@ import Clipboard from "clipboard";
 let id = (i) => document.getElementById(i);
 
 function eventFire(el, etype){
-  if (el.fireEvent) {
-    el.fireEvent('on' + etype);
-  } else {
-    var evObj = document.createEvent('Events');
-    evObj.initEvent(etype, true, false);
-    el.dispatchEvent(evObj);
-  }
+	if (el.fireEvent) {
+		el.fireEvent('on' + etype);
+	} else {
+		var evObj = document.createEvent('Events');
+		evObj.initEvent(etype, true, false);
+		el.dispatchEvent(evObj);
+	}
 }
 
 function setColor (e) {
@@ -34,7 +34,7 @@ id("grab").onclick = () => {
 		.query({url})
 		.end((err,res) => {
 			res = res.body.map((val,i) =>
-				<div onClick = {setColor} className = "color" data-color = {val.color} key = {i} style = {{background : val.color}}></div>
+				<div onClick = {setColor} className = "color" data-color = {val} key = {i} style = {{background : val}}></div>
 			);
 			ReactDom.render(<div className = "inner">{res}</div>,id("colors"));
 		});

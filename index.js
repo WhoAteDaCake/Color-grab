@@ -59,8 +59,7 @@ app.get("/",(req, res) => {
     res.sendFile(__dirname + '/public/index.html');
 });
 app.get("/color",(req, res) => {
-    extr.setUrl(req.query.url);
-    extr.extractColors()
+    extr.grabColors(req.query.url)
         .then((data) => {
             res.json(data);
         })
