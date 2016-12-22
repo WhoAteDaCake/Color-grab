@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		   <script src="/js/index_mainP3DiRNe.js" defer></script>
-            <link rel="stylesheet" type="text/css" href="/css/mainP3DiRNe.css">
+		   <script src="/js/index_mainSwzwbNF.js" defer></script>
+            <link rel="stylesheet" type="text/css" href="/css/mainSwzwbNF.css">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/components/input.min.css" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/components/button.min.css" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/components/form.min.css" />
@@ -11,6 +11,14 @@
 		<div class = "wrapper" id = "mscreen">
 			<div class=" ui input">
 				<input placeholder = "Enter url here" type="text" id="url"></input>
+				<select id = "selector" name="sortType">
+					<option value="hue-inc">hue-inc</option>
+					<option value="sat-inc">sat-inc</option>
+					<option value="val-inc">val-inc</option>
+					<option value="hue-dec">hue-dec</option>
+					<option value="sat-dec">sat-dec</option>
+					<option value="val-dec">val-dec</option>
+				</select>
 				<button class = "ui button" id="grab">Grab</button>
 				<div class = "field info">
 					<p>Click on the color to copy to clipboard</p>

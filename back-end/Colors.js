@@ -15,16 +15,44 @@ module.exports = class Color {
 		this._colorFix = this._colorFix.bind(this);
 		this._hsl2hex = this._hsl2hex.bind(this);
 		this._rgb2hex = this._rgb2hex.bind(this);
+		this._errFix = this._errFix.bind(this);
 	}
 	_flatten(a) {
 		return a.map?[].concat(...a.map(this._flatten)):a;
 	}
-	_urlFix(link) {
-
-		if(link[0] + link[1] === "//" && link.search("http") <= 0) {
+	_urlFix(link,initial) {
+		if(initial) {
+			if(link.indexOf("www") === 0 && link.indexOf("http") < 0) {
+				this.url = "http://" + link.split("/")[0];
+			} else {
+				let url = link.split("/");
+				this.url = url[0] + "//" + url[2];
+			}
+		} else if(link[0] + link[1] === "//") {
 			return "http:" + link;
+		} else if(link[0] === "/") {
+			return this.url + link;
+		} else {
+			return link;
 		}
-		return link;
+
+	}
+	_errFix(errorMain,message,info) {
+		if(errorMain.message) {
+			console.log(message,errorMain.message);
+			return errorMain;
+		}else if (info){
+			return {
+				message : message,
+				error : errorMain,
+				information : info
+			};
+		} else {
+			return {
+				message : message,
+				error : errorMain,
+			};
+		}
 	}
 	_rgb2hex(rgb) {
 		 rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
@@ -95,20 +123,20 @@ module.exports = class Color {
 	_colorFix(colors) {
 		return colors.map((color) => {
 			if(color.length <= 4) {
-				return color[0] +
+				color = color[0] +
 				color[1] + color[1] +
 				color[2] + color[2] +
 				color[3] + color[3];
 			} else if((/(hsl)|(rgb)/g).test(color) === true) {
-				color = color.substring(0,color.search(/\)/) + 1);
+
 				if(color.search("hsl") >= 0) {
-					return this._hsl2hex(color);
+					color = this._hsl2hex(color);
 				} else {
-					return this._rgb2hex(color);
+					color = this._rgb2hex(color);
 				}
-			} else {
-				return color;
 			}
+
+			return color.toUpperCase();
 		})
 	}
 	_pageGrab(url) {
@@ -116,15 +144,16 @@ module.exports = class Color {
 		return new Promise((res1,rej1) => {
 			superagent.get(url)
 				.end((err,resp) => {
-					if(err) {
-						rej1({message : "Failed getting the page",error : err});
+					if(err || !resp) {
+						rej1(this._errFix(err,"Failed getting the page",{page : url}));
+					} else {
+						res1(resp.text);
 					}
-					res1(resp.text);
 				});
 		});
 	}
 	_grabInternal(page) {
-		return new Promise((res1,rej1) => {
+		return new Promise((res1) => {
 
 			let hash = page.match(/(#(([a-fA-F]|[0-9]){6}|([a-fA-F]|[0-9]){3}))/g) || [],
 				adv = page.match(/((hsl)|(hsla)|(rgba)|(rgb))(\([^\)]*\))/g) || [];
@@ -149,21 +178,89 @@ module.exports = class Color {
 					.then(page => {
 						this._grabInternal(page)
 							.then(colors => res2(colors))
-							.catch(err => rej2({message : "Failed extracting external css page",error : err}));
+							.catch(err => rej2(this._errFix(err,"Failed extracting external css page")))
 					})
-					.catch(err => {
-						return rej2({message : "Failed extracting external css page",error : err});
-					});
+					.catch(err => rej2(this._errFix(err,"Failed extracting external css page")));
 			}));
 
 			Promise.all(promiseChain)
 				.then((data) => res1(data))
-				.catch(err => rej1({message : "Failed extracting external css",error : err}));
+				.catch(err => rej1(this._errFix(err,"Failed extracting external css")))
 		});
 	}
- 	grabColors(url) {
+	sortColors(colors,sortType) {
+		// from
+		//http://runtime-era.blogspot.co.uk/2011/11/grouping-html-hex-colors-by-hue-in.html
+	    for (var c = 0; c < colors.length; c++) {
+
+			let color = colors[c];
+			colors[c] = {
+				hex : color
+			}
+
+			var hex = colors[c].hex.substring(1),
+	        	r = parseInt(hex.substring(0,2),16)/255,
+	        	g = parseInt(hex.substring(2,4),16)/255,
+	         	b = parseInt(hex.substring(4,6),16)/255;
+
+	        var max = Math.max.apply(Math, [r,g,b]),
+	         	min = Math.min.apply(Math, [r,g,b]);
+
+	        var chr = max-min,
+	         	hue = 0,
+	         	val = max,
+	         	sat = 0;
+
+	        if (val > 0) {
+	            /* Calculate Saturation only if Value isn't 0. */
+	            sat = chr/val;
+	            if (sat > 0) {
+	                if (r == max) {
+	                    hue = 60*(((g-min)-(b-min))/chr);
+	                    if (hue < 0) {hue += 360;}
+	                } else if (g == max) {
+	                    hue = 120+60*(((b-min)-(r-min))/chr);
+	                } else if (b == max) {
+	                    hue = 240+60*(((r-min)-(g-min))/chr);
+	                }
+	            }
+	        }
+
+	        /* Modifies existing objects by adding HSV values. */
+	        colors[c].hue = hue;
+	        colors[c].sat = sat;
+	        colors[c].val = val;
+	    }
+		switch(sortType) {
+			case "hue-inc" :
+				colors = colors.sort(function(a,b){return a.hue - b.hue;});
+				break;
+			case "sat-inc" :
+				colors = colors.sort(function(a,b){return a.sat - b.sat;});
+				break;
+			case "val-inc" :
+				colors = colors.sort(function(a,b){return a.val - b.val;});
+				break;
+			case "hue-dec" :
+				colors = colors.sort(function(a,b){return b.hue - a.hue;});
+				break;
+			case "val-dec" :
+				colors = colors.sort(function(a,b){return b.val - a.val;});
+				break;
+			case "sat-dec" :
+				colors = colors.sort(function(a,b){return b.sat - a.sat;});
+				break;
+			default :
+				return {message : "No sort criteria given",given : sortType}
+				break;
+		}
+	    return colors.map(color => color.hex);
+	}
+	grabColors(url) {
 
 		return new Promise((res1,rej1) => {
+
+			this._urlFix(url,true);
 
 			this._pageGrab(url)
 			.then(page => {

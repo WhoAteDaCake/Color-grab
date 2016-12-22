@@ -1,4 +1,4 @@
-import sa from "superagent";
+import superagent from "superagent";
 import React from "react";
 import ReactDom from "react-dom";
 import Clipboard from "clipboard";
@@ -24,18 +24,23 @@ function setColor (e) {
 
 id("grab").onclick = () => {
 
-	let url = id("url").value;
+	let url = id("url").value,
+		sortType = id("selector").value;
 	if(url.length < 3) {
 		alert("Please enter valid url");
 		return;
 	}
-	sa
+	superagent
 		.get("/color")
-		.query({url})
+		.query({url,sortType})
 		.end((err,res) => {
-			res = res.body.map((val,i) =>
-				<div onClick = {setColor} className = "color" data-color = {val} key = {i} style = {{background : val}}></div>
-			);
-			ReactDom.render(<div className = "inner">{res}</div>,id("colors"));
+			if(!err && Object.prototype.toString.call( res.body ) === '[object Array]' ){
+				res = res.body.map((val,i) =>
+					<div onClick = {setColor} className = "color" data-color = {val} key = {i} style = {{background : val}}></div>
+				);
+				ReactDom.render(<div className = "inner">{res}</div>,id("colors"));
+			} else {
+				console.log(JSON.parse(res.text));
+			}
 		});
 };

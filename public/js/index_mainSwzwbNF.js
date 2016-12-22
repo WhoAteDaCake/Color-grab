@@ -42,20 +42,25 @@ function setColor(e) {
 
 id("grab").onclick = function () {
 
-	var url = id("url").value;
+	var url = id("url").value,
+	    sortType = id("selector").value;
 	if (url.length < 3) {
 		alert("Please enter valid url");
 		return;
 	}
-	_superagent2.default.get("/color").query({ url: url }).end(function (err, res) {
-		res = res.body.map(function (val, i) {
-			return _react2.default.createElement("div", { onClick: setColor, className: "color", "data-color": val, key: i, style: { background: val } });
-		});
-		_reactDom2.default.render(_react2.default.createElement(
-			"div",
-			{ className: "inner" },
-			res
-		), id("colors"));
+	_superagent2.default.get("/color").query({ url: url, sortType: sortType }).end(function (err, res) {
+		if (!err && Object.prototype.toString.call(res.body) === '[object Array]') {
+			res = res.body.map(function (val, i) {
+				return _react2.default.createElement("div", { onClick: setColor, className: "color", "data-color": val, key: i, style: { background: val } });
+			});
+			_reactDom2.default.render(_react2.default.createElement(
+				"div",
+				{ className: "inner" },
+				res
+			), id("colors"));
+		} else {
+			console.log(JSON.parse(res.text));
+		}
 	});
 };
 },{"clipboard":3,"react":186,"react-dom":33,"superagent":188}],2:[function(require,module,exports){

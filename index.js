@@ -51,21 +51,24 @@ app.use(bodyParser.json());//for  aplication/json
 app.use(bodyParser.urlencoded({extended : true}));//for application/x-www-form-urlencoded
 app.use(express.static(__dirname + '/public'));
 
-const fileHash = rand(6),
-    extr = new Color();
+const fileHash = rand(6);
 
 
 app.get("/",(req, res) => {
     res.sendFile(__dirname + '/public/index.html');
 });
 app.get("/color",(req, res) => {
+	if(!req.query.sortType) {
+		req.query.sortType = "hue-inc";
+	}
+
+	let extr = new Color();
     extr.grabColors(req.query.url)
         .then((data) => {
-            res.json(data);
+            res.json(extr.sortColors(data,req.query.sortType));
         })
         .catch(err => {
-            console.log(err);
-            res.status(500).send(err)
+            res.send(err);
         })
 });
 
