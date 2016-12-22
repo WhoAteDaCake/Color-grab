@@ -23,6 +23,7 @@ function setColor (e) {
 }
 
 function syntaxHighlight(json) {
+	//taken from http://stackoverflow.com/a/7220510/5716739
     json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
         var cls = 'number';
@@ -49,6 +50,7 @@ id("grab").onclick = () => {
 		alert("Please enter valid url");
 		return;
 	}
+
 	superagent
 		.get("/color")
 		.query({url,sortType})
@@ -59,7 +61,7 @@ id("grab").onclick = () => {
 				);
 				ReactDom.render(<div className = "inner">{res}</div>,id("colors"));
 			} else {
-				let message = JSON.stringify(JSON.parse(res.text),null,4);
+				let message = JSON.stringify(JSON.parse(res.text),null,'\t');
 				let errorBody = <div key = {1} dangerouslySetInnerHTML = {{__html : syntaxHighlight(message)}}></div>;
 
 				ReactDom.render(<div><pre>{errorBody}</pre></div>,id("colors"));

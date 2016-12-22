@@ -41,6 +41,7 @@ function setColor(e) {
 }
 
 function syntaxHighlight(json) {
+	//taken from http://stackoverflow.com/a/7220510/5716739
 	json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 	return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
 		var cls = 'number';
@@ -67,6 +68,7 @@ id("grab").onclick = function () {
 		alert("Please enter valid url");
 		return;
 	}
+
 	_superagent2.default.get("/color").query({ url: url, sortType: sortType }).end(function (err, res) {
 		if (!err && Object.prototype.toString.call(res.body) === '[object Array]') {
 			res = res.body.map(function (val, i) {
@@ -78,7 +80,7 @@ id("grab").onclick = function () {
 				res
 			), id("colors"));
 		} else {
-			var message = JSON.stringify(JSON.parse(res.text), null, 4);
+			var message = JSON.stringify(JSON.parse(res.text), null, '\t');
 			var errorBody = _react2.default.createElement("div", { key: 1, dangerouslySetInnerHTML: { __html: syntaxHighlight(message) } });
 
 			_reactDom2.default.render(_react2.default.createElement(

@@ -16,6 +16,7 @@ module.exports = class Color {
 		this._hsl2hex = this._hsl2hex.bind(this);
 		this._rgb2hex = this._rgb2hex.bind(this);
 		this._errFix = this._errFix.bind(this);
+		this._urlClear = this._urlClear.bind(this);
 	}
 	_flatten(a) {
 		return a.map?[].concat(...a.map(this._flatten)):a;
@@ -34,13 +35,27 @@ module.exports = class Color {
 			return "http:" + link;
 		} else if(link[0] === "/") {
 			return this.url + link;
-		} else if(link[0] + link[1] === "..") {
-			link = link.replace(/\.\.\//g,"");
-			return this.url + "/" + link;
+		} else if(link[0] + link[1] === ".." || link.charCodeAt(0) >= 65 && link.search("http") < 0) {
+			return this.org + link;
 		} else {
 			return link;
 		}
 
+	}
+	_urlClear(link) {
+		let protocol = link.split("//")[0] || "http";
+
+		link = link.replace("https://","")
+			.replace("http://","")
+			.split("/");
+
+		let url = "";
+		for(let i = 0; i < link.length -1 ; i++) {
+			url += link[i] + "/";
+		}
+
+		url = protocol + "//" + url;
+		return url;
 	}
 	_errFix(errorMain,message,info) {
 		if(errorMain.message) {
@@ -185,6 +200,15 @@ module.exports = class Color {
 				}
 			});
 
+			let imports = page.match(/(@import)(.|\n)*(\.css)/gm) || [];
+
+			imports.map(val => {
+				val = val.replace(/\s/g,"")
+					.replace("@import","");
+				val = val.substring(1,val.length);
+				links.push(this._urlFix(val));
+			});
+
 			let promiseChain = links.map(link => new Promise((res2,rej2) => {
 				this._pageGrab(link)
 					.then(page => {
@@ -272,6 +296,8 @@ module.exports = class Color {
 		return new Promise((res1,rej1) => {
 
 			this._urlFix(url,true);
+			this.org = this._urlClear(url);
+
 			this._pageGrab(url)
 			.then(page => {
 
