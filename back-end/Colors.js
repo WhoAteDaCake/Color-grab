@@ -157,7 +157,7 @@ module.exports = class Color {
 			superagent.get(url)
 				.end((err,resp) => {
 					if(err || !resp) {
-						rej1(this._errFix(err,"Failed getting the page",{page : url}));
+						rej1(this._errFix(err,"Failed getting the page",{page : this.url + url}));
 					} else {
 						res1(resp.text);
 					}
@@ -272,7 +272,6 @@ module.exports = class Color {
 		return new Promise((res1,rej1) => {
 
 			this._urlFix(url,true);
-			console.log(this.url);
 			this._pageGrab(url)
 			.then(page => {
 

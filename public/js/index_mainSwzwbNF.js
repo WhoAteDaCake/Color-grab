@@ -40,6 +40,25 @@ function setColor(e) {
 	eventFire(id("copy"), 'click');
 }
 
+function syntaxHighlight(json) {
+	json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+		var cls = 'number';
+		if (/^"/.test(match)) {
+			if (/:$/.test(match)) {
+				cls = 'key';
+			} else {
+				cls = 'string';
+			}
+		} else if (/true|false/.test(match)) {
+			cls = 'boolean';
+		} else if (/null/.test(match)) {
+			cls = 'null';
+		}
+		return '<span class="' + cls + '">' + match + '</span>';
+	});
+}
+
 id("grab").onclick = function () {
 
 	var url = id("url").value,
@@ -59,7 +78,18 @@ id("grab").onclick = function () {
 				res
 			), id("colors"));
 		} else {
-			console.log(JSON.parse(res.text));
+			var message = JSON.stringify(JSON.parse(res.text), null, 4);
+			var errorBody = _react2.default.createElement("div", { key: 1, dangerouslySetInnerHTML: { __html: syntaxHighlight(message) } });
+
+			_reactDom2.default.render(_react2.default.createElement(
+				"div",
+				null,
+				_react2.default.createElement(
+					"pre",
+					null,
+					errorBody
+				)
+			), id("colors"));
 		}
 	});
 };
