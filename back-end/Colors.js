@@ -195,7 +195,10 @@ module.exports = class Color {
 			$(page).children("head").children("link").map((val,elem) => {
 
 				let href = elem.attribs.href;
-				if(href && (/.*(.css)$|(.css\?)/gm).test(href) === true ) {
+				if(
+					href && (/.*(.css)$|(.css\?)/gm).test(href) === true ||
+					elem.attribs.rel === "stylesheet"
+				) {
 					links.push(this._urlFix(href));
 				}
 			});
