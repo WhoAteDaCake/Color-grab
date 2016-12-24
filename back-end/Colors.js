@@ -299,7 +299,7 @@ module.exports = class Color {
 		return new Promise((res1,rej1) => {
 
 			this._urlFix(url,true);
-			this.org = this._urlClear(url);
+			this.org = this._urlClear(url) || "";
 
 			this._pageGrab(url)
 			.then(page => {
